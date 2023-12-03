@@ -9,8 +9,13 @@ connection = pymysql.connect(host='localhost',
 
 # Assume the received data is in the format: "sensor_id reading\n"
 def parse_sensor_data(data):
-    sensor_id, reading = data.strip().split()
-    return int(sensor_id), float(reading)
+    parts = data.strip().split()
+    sensor_id = int(parts[0])
+    reading = float(parts[1])
+    temperature = int(parts[2])
+    humidity = int(parts[3])
+    luminance = int(parts[4])
+    return sensor_id, reading, temperature, humidity, luminance
 
 # Modify this part to read from FIFO and process the received data
 with open('fifo', 'r') as fifo_file:
