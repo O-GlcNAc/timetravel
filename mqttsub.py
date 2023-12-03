@@ -67,6 +67,9 @@ def process_data():
     generate_plot(df)
 
 def generate_plot(df):
+    print("Generating plot for data:")
+    print(df)
+    
     plt.figure(figsize=(10, 5))
     df.plot(use_index=True, y=["temperature", "humidity", "illuminance"], kind="line", figsize=(10, 5)).legend(loc='upper left')
     img = BytesIO()
