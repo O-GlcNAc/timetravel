@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Real-time Plot</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.3.2/socket.io.js" integrity="sha512-MZ04DEjs7kV7JTz9TyprlXEfjioogDzalKElY2Fw4pZCtN81wJOh9t1IwM/mQYjz3V+f5OvkN87VwPclkepWEg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('connect', function() {
+            socket.emit('get_plot');
+        });
+
+        socket.on('update_plot', function(data) {
+            document.getElementById('plot').src = '/static/' + data + '?' + new Date().getTime(); // Update the image source
+        });
+    </script>
+</head>
+<body>
+    <h1>Real-time Plot</h1>
+    <img id="plot" src="" alt="Plot">
+</body>
+</html>
