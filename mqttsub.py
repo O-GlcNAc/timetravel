@@ -1,13 +1,9 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
-import pymysql
 import pandas as pd
 import matplotlib.pyplot as plt
-import numpy as np
-from random import randrange
-from sqlalchemy import create_engine
+from io import BytesIO
 import paho.mqtt.client as mqtt
-
 
 broker_address = '127.0.0.1'
 broker_port = 1883
@@ -28,9 +24,6 @@ def on_message(client, userdata, msg):
         process_data()
 
 def process_data():
-    # Process received_data (parse, convert to DataFrame, etc.)
-    # Assuming received_data format: "sensor_id: ..., temperature: ..., humidity: ..., illuminance: ..., timestamp: ..."
-    # Example parsing logic:
     sensor_ids, temperatures, humidities, illuminances, timestamps = [], [], [], [], []
     for data in received_data:
         parts = data.split(', ')
@@ -51,10 +44,13 @@ def process_data():
     generate_plot(df)
 
 def generate_plot(df):
-    plot = df.plot(use_index=True, y=["temperature", "humidity", "illuminance"], kind="line", figsize=(10, 5)).legend(loc='upper left')
-    plt.savefig('static/plot.png')
-    plt.close()
-    emit('update_plot', 'plot.png')
+    plt.figure(figsize=(10, 5))
+    df.plot(use_index=True, y=["temperature", "humidity", "illuminance"], kind="line", figsize=(10, 5)).legend(loc='upper left')
+    img = BytesIO()
+    plt.savefig(img, format='png')
+    img.seek(0)
+    img_data = img.getvalue()
+    emit('update_plot', img_data)
 
 client = mqtt.Client()
 client.on_connect = on_connect
@@ -68,7 +64,6 @@ def index():
 
 @socketio.on('get_plot')
 def handle_get_plot():
-    # Assuming you have a function to retrieve sensor data from the processed MQTT messages
     sensor_data = get_sensor_data()
     if sensor_data is not None:
         generate_plot(sensor_data)
