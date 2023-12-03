@@ -7,7 +7,7 @@ connection = pymysql.connect(host='localhost',
                              database='exam',
                              cursorclass=pymysql.cursors.DictCursor)
 
-# Assume the received data is in the format: "sensor_id reading\n"
+# 수정된 함수: timestamp도 파싱
 def parse_sensor_data(data):
     parts = data.strip().split()
     sensor_id = int(parts[0])
@@ -15,7 +15,8 @@ def parse_sensor_data(data):
     temperature = float(parts[2])
     humidity = float(parts[3])
     illuminance = float(parts[4])
-    return sensor_id, reading, temperature, humidity, illuminance
+    timestamp = parts[5]  # timestamp 추가
+    return sensor_id, reading, temperature, humidity, illuminance, timestamp
 
 # Modify this part to read from FIFO and process the received data
 with open('fifo', 'r') as fifo_file:
@@ -24,20 +25,20 @@ with open('fifo', 'r') as fifo_file:
         if not line:
             continue
 
-        sensor_id,reading,temperature,humidity,illuminance = parse_sensor_data(line)  # Parse the received data
-        timestamp = None  # Since the timestamp is automatically added, no need to specify here
+        sensor_id, reading, temperature, humidity, illuminance, timestamp = parse_sensor_data(line)  # Parse the received data
 
         with connection.cursor() as cursor:
             # Insert the parsed data into SensorData table
-            sql = "INSERT INTO SensorData (sensor_id, reading,temperature,humidity,illuminance,timestamp) VALUES (%s, %s,%s,%s,%s, CURRENT_TIMESTAMP)"
-            cursor.execute(sql, (sensor_id, reading, temperature,humidity,illuminance))
+            # CURRENT_TIMESTAMP 대신 클라이언트에서 보낸 timestamp 사용
+            sql = "INSERT INTO SensorData (sensor_id, reading, temperature, humidity, illuminance, timestamp) VALUES (%s, %s, %s, %s, %s, %s)"
+            cursor.execute(sql, (sensor_id, reading, temperature, humidity, illuminance, timestamp))
 
         # Commit the changes to the database
         connection.commit()
 
         # Display the inserted data
         with connection.cursor() as cursor:
-            sql = "SELECT * FROM SensorData WHERE sensor_id = %s AND reading = %s"
-            cursor.execute(sql, (sensor_id, reading))
+            sql = "SELECT * FROM SensorData WHERE sensor_id = %s AND reading = %s AND timestamp = %s"
+            cursor.execute(sql, (sensor_id, reading, timestamp))
             result = cursor.fetchone()
             print(result)
