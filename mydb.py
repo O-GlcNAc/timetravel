@@ -12,9 +12,9 @@ def parse_sensor_data(data):
     parts = data.strip().split()
     sensor_id = int(parts[0])
     reading = float(parts[1])
-    temperature = int(parts[2])
-    humidity = int(parts[3])
-    luminance = int(parts[4])
+    temperature = float(parts[2])
+    humidity = float(parts[3])
+    luminance = float(parts[4])
     return sensor_id, reading, temperature, humidity, luminance
 
 # Modify this part to read from FIFO and process the received data
