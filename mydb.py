@@ -14,8 +14,8 @@ def parse_sensor_data(data):
     reading = float(parts[1])
     temperature = float(parts[2])
     humidity = float(parts[3])
-    luminance = float(parts[4])
-    return sensor_id, reading, temperature, humidity, luminance
+    illuminance = float(parts[4])
+    return sensor_id, reading, temperature, humidity, illuminance
 
 # Modify this part to read from FIFO and process the received data
 with open('fifo', 'r') as fifo_file:
@@ -24,13 +24,13 @@ with open('fifo', 'r') as fifo_file:
         if not line:
             continue
 
-        sensor_id,reading,temperature,humidity,luminance = parse_sensor_data(line)  # Parse the received data
+        sensor_id,reading,temperature,humidity,illuminance = parse_sensor_data(line)  # Parse the received data
         timestamp = None  # Since the timestamp is automatically added, no need to specify here
 
         with connection.cursor() as cursor:
             # Insert the parsed data into SensorData table
-            sql = "INSERT INTO SensorData (sensor_id, reading,temperature,humidity,luminance,timestamp) VALUES (%s, %s,%s,%s,%s, CURRENT_TIMESTAMP)"
-            cursor.execute(sql, (sensor_id, reading, temperature,humidity,luminance))
+            sql = "INSERT INTO SensorData (sensor_id, reading,temperature,humidity,illuminance,timestamp) VALUES (%s, %s,%s,%s,%s, CURRENT_TIMESTAMP)"
+            cursor.execute(sql, (sensor_id, reading, temperature,humidity,illuminance))
 
         # Commit the changes to the database
         connection.commit()
