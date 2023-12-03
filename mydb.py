@@ -4,7 +4,7 @@ import pymysql.cursors
 connection = pymysql.connect(host='localhost',
                              user='scott',
                              password='tiger',
-                             database='mydb',
+                             database='exam',
                              cursorclass=pymysql.cursors.DictCursor)
 
 # Assume the received data is in the format: "sensor_id reading\n"
