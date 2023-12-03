@@ -25,7 +25,8 @@ int main(int argc, char **argv) {
         char timestamp[20];
 
         // 현재 시간을 "YYYY-MM-DD HH:MM:SS" 형식으로 변환
-        strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", localtime(&current_time));
+        strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", gmtime(&current_time));
+
 
         if (sensor_id == 1) {
             reading = rand() % 61 - 20; // sensor_id 1의 reading은 -20에서 40 사이 값
