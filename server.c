@@ -32,6 +32,12 @@ int main(int argc, char **argv) {
         if (n > 0) {
             buf[n] = '\0'; // Null-terminate 문자열
 
+                 // 타임스탬프 추출 및 출력
+            char *last_token = strrchr(buf, ' ');
+            if (last_token != NULL) {
+                printf("Timestamp: %s\n", last_token + 1);
+            }
+
             // 파이썬 스크립트를 호출하여 FIFO로부터 받은 데이터를 전달하고 MariaDB에 데이터 삽입
             sprintf(command, "python3 %s \"%s\"", PYTHON_SCRIPT, buf);
             fp = popen(command, "r");
