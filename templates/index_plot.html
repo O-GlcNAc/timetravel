@@ -1,22 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sensor Data Plot</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+    <style>
+        #plot {
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h1>Sensor Data Plot</h1>
-    <button onclick="updatePlot()">Update Plot</button><br>
-    <img id="plot" src="" alt="plot">
+    <h1>Real-time Sensor Data Plot</h1>
+    <div id="plot">
+        <img id="dataPlot" src="" alt="Sensor data plot will appear here">
+    </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.2/socket.io.js"></script>
     <script type="text/javascript">
-	    const socket=io.connect('http://localhost:5001');
-	    socket.on('update_plot',function(filename){
-				document.getElementById('plot').src='static/'+filename+"?a="+Math.random();
-			});
-	    function updatePlot() {
-				socket.emit('get_plot'); 
-			}
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('connect', function() {
+            console.log('Websocket connected!');
+            socket.emit('get_plot');
+        });
+
+        socket.on('update_plot', function(imgData) {
+            var plotElement = document.getElementById('dataPlot');
+            plotElement.src = 'data:image/png;base64,' + imgData;
+        });
     </script>
 </body>
 </html>
