@@ -13,6 +13,28 @@ received_data = []
 app = Flask(__name__)
 socketio = SocketIO(app, cors_allowed_origins="*")
 
+def get_sensor_data():
+    if not received_data:
+        return None
+
+    # 가정: 가장 최근의 데이터를 그래프로 그리고 싶은 경우
+    latest_data = received_data[-1]  # 마지막으로 수신된 데이터 가져오기
+    parts = latest_data.split(', ')
+    sensor_id = parts[0].split(': ')[1]
+    temperature = float(parts[1].split(': ')[1])
+    humidity = float(parts[2].split(': ')[1])
+    illuminance = float(parts[3].split(': ')[1])
+    timestamp = parts[4].split(': ')[1]
+
+    return pd.DataFrame({
+        'sensor_id': [sensor_id],
+        'temperature': [temperature],
+        'humidity': [humidity],
+        'illuminance': [illuminance],
+        'timestamp': [timestamp]
+    })
+
+
 def on_connect(client, userdata, flags, rc):
     print("Connected to MQTT broker")
     client.subscribe(topic)
