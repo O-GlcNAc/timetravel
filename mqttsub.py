@@ -50,7 +50,7 @@ def generate_plot(df):
     plt.savefig(img, format='png')
     img.seek(0)
     img_data = img.getvalue()
-    emit('update_plot', img_data)
+    socketio.emit('update_plot', img_data)  # Use the socketio.emit to send data to the client
 
 client = mqtt.Client()
 client.on_connect = on_connect
@@ -64,6 +64,7 @@ def index():
 
 @socketio.on('get_plot')
 def handle_get_plot():
+    # Define get_sensor_data() function or fetch data here
     sensor_data = get_sensor_data()
     if sensor_data is not None:
         generate_plot(sensor_data)
