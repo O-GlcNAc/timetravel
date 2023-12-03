@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
         }
 
         // FIFO로 sensor_id와 reading 데이터 전송
-        dprintf(fd, "%d %d\n", sensor_id, reading,temperature,humidity,luminance);
+        dprintf(fd, "%d %d %d %d %d\n", sensor_id, reading,temperature,humidity,luminance);
 
         sleep(1); // 1초 대기
     }
