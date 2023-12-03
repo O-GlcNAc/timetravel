@@ -1,7 +1,13 @@
-import paho.mqtt.client as mqtt
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
+import pymysql
 import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+from random import randrange
+from sqlalchemy import create_engine
+import paho.mqtt.client as mqtt
+
 
 broker_address = '127.0.0.1'
 broker_port = 1883
