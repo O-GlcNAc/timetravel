@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from io import BytesIO
 import paho.mqtt.client as mqtt
+import base64
 
 broker_address = '127.0.0.1'
 broker_port = 1883
@@ -71,8 +72,8 @@ def generate_plot(df):
     img = BytesIO()
     plt.savefig(img, format='png')
     img.seek(0)
-    img_data = img.getvalue()
-    socketio.emit('update_plot', img_data)  # Use the socketio.emit to send data to the client
+    img_data = base64.b64encode(img.getvalue()).decode()  # Base64로 인코딩
+    socketio.emit('update_plot', img_data)
 
 client = mqtt.Client()
 client.on_connect = on_connect
