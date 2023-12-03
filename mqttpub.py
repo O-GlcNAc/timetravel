@@ -1,71 +1,46 @@
+import pymysql
 import paho.mqtt.client as mqtt
-from flask import Flask, render_template
-from flask_socketio import SocketIO, emit
-import pandas as pd
+import time
 
+# MQTT Broker configuration
 broker_address = '127.0.0.1'
 broker_port = 1883
 topic = 'my/topic'
-received_data = []
 
-app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
+while True:
+    # MariaDB 연결 설정
+    conn = pymysql.connect(
+        host='localhost',
+        user='scott',
+        password='tiger',
+        database='exam'
+    )
 
-def on_connect(client, userdata, flags, rc):
-    print("Connected to MQTT broker")
-    client.subscribe(topic)
+    cursor = conn.cursor()
 
-def on_message(client, userdata, msg):
-    print(f"Received: {msg.payload.decode()}")
-    received_data.append(msg.payload.decode())
-    if len(received_data) == 50:  # If 50 messages received
-        process_data()
+    # SensorData 테이블에서 가장 최신의 50개 데이터 가져오기
+    query = """
+        SELECT sensor_id, temperature, humidity, illuminance, timestamp
+        FROM SensorData
+        ORDER BY timestamp DESC
+        LIMIT 50
+    """
 
-def process_data():
-    # Process received_data (parse, convert to DataFrame, etc.)
-    # Assuming received_data format: "sensor_id: ..., temperature: ..., humidity: ..., illuminance: ..., timestamp: ..."
-    # Example parsing logic:
-    sensor_ids, temperatures, humidities, illuminances, timestamps = [], [], [], [], []
-    for data in received_data:
-        parts = data.split(', ')
-        sensor_ids.append(parts[0].split(': ')[1])
-        temperatures.append(float(parts[1].split(': ')[1]))
-        humidities.append(float(parts[2].split(': ')[1]))
-        illuminances.append(float(parts[3].split(': ')[1]))
-        timestamps.append(parts[4].split(': ')[1])
+    cursor.execute(query)
+    latest_data = cursor.fetchall()  # 모든 50개의 데이터를 가져옴
 
-    df = pd.DataFrame({
-        'sensor_id': sensor_ids,
-        'temperature': temperatures,
-        'humidity': humidities,
-        'illuminance': illuminances,
-        'timestamp': timestamps
-    })
+    # 만약 latest_data가 존재하면 MQTT 브로커로 전송
+    if latest_data:
+        client = mqtt.Client()
+        client.connect(broker_address, broker_port)
 
-    generate_plot(df)
+        for data in latest_data:
+            sensor_id, temperature, humidity, illuminance, timestamp = data
+            message = f"sensor_id: {sensor_id}, temperature: {temperature}, humidity: {humidity}, illuminance: {illuminance}, timestamp: {timestamp}"
+            
+            client.publish(topic, message)
+            print(f"Published: {message}")
 
-def generate_plot(df):
-    plot = df.plot(use_index=True, y=["temperature", "humidity", "illuminance"], kind="line", figsize=(10, 5)).legend(loc='upper left')
-    plt.savefig('static/plot.png')
-    plt.close()
-    emit('update_plot', 'plot.png')
+    conn.close()
 
-client = mqtt.Client()
-client.on_connect = on_connect
-client.on_message = on_message
-client.connect(broker_address, broker_port)
-client.loop_start()
-
-@app.route('/')
-def index():
-    return render_template("index_plot.html")
-
-@socketio.on('get_plot')
-def handle_get_plot():
-    # Assuming you have a function to retrieve sensor data from the processed MQTT messages
-    sensor_data = get_sensor_data()
-    if sensor_data is not None:
-        generate_plot(sensor_data)
-
-if __name__ == '__main__':
-    socketio.run(app, port=5001)
+    time.sleep(5)  # 5초 대기 후 다음 루프 실행
