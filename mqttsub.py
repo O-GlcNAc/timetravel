@@ -67,15 +67,29 @@ def process_data():
     generate_plot(df)
 
 def generate_plot(df):
-    print("Generating plot for data:")
-    print(df)
+    # 시간 데이터를 datetime 객체로 변환하고 정렬
+    df['timestamp'] = pd.to_datetime(df['timestamp'])
+    df = df.sort_values('timestamp')
+
+    # 센서 ID에 따라 데이터를 필터링하고 그래프 생성
+    for sensor_id in df['sensor_id'].unique():
+        sensor_df = df[df['sensor_id'] == sensor_id]
+        plt.plot(sensor_df['timestamp'], sensor_df['temperature'], label=f'Temp Sensor {sensor_id}')
+        plt.plot(sensor_df['timestamp'], sensor_df['humidity'], label=f'Humidity Sensor {sensor_id}')
+        plt.plot(sensor_df['timestamp'], sensor_df['illuminance'], label=f'Illuminance Sensor {sensor_id}')
     
-    plt.figure(figsize=(10, 5))
-    df.plot(use_index=True, y=["temperature", "humidity", "illuminance"], kind="line", figsize=(10, 5)).legend(loc='upper left')
+    plt.legend()
+    plt.xlabel('Timestamp')
+    plt.ylabel('Values')
+    plt.xticks(rotation=45)  # x축 레이블 회전
+    plt.tight_layout()  # 레이아웃 조정
+
+    # 이미지 저장 및 전송
     img = BytesIO()
-    plt.savefig(img, format='png')
+    plt.savefig(img, format='png', bbox_inches='tight')
+    plt.close()  # 중요: 리소스 해제
     img.seek(0)
-    img_data = base64.b64encode(img.getvalue()).decode()  # Base64로 인코딩
+    img_data = base64.b64encode(img.getvalue()).decode()
     socketio.emit('update_plot', img_data)
 
 client = mqtt.Client()
