@@ -8,8 +8,10 @@
 
 int main(int argc, char **argv) {
     int fd;
-    struct tm start_time = { .tm_year = 123, .tm_mon = 11, .tm_mday = 3, .tm_hour = 0, .tm_min = 0, .tm_sec = 0 }; // 2023-12-03 00:00:00
-    time_t current_time = mktime(&start_time);
+
+    struct tm *tm_current = localtime(&current_time);
+    strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", tm_current);
+
 
 
     if ((fd = open(FIFOFILE, O_WRONLY)) < 0) { // FIFO를 쓰기 전용으로 열기
@@ -53,7 +55,7 @@ int main(int argc, char **argv) {
          // 현재 시간을 10분 증가시킴
         tm_current->tm_min += 10;
         current_time = mktime(tm_current); // 업데이트된 tm 구조체를 다시 time_t로 변환
-
+        
         sleep(1); // 1초 대기
     }
 
