@@ -52,7 +52,12 @@ int main(int argc, char **argv) {
         tm_current->tm_min += 10;
         current_time = mktime(tm_current); // 업데이트된 tm 구조체를 다시 time_t로 변환
 
+        char updated_time_str[20];
+        strftime(updated_time_str, sizeof(updated_time_str), "%Y-%m-%d %H:%M:%S", localtime(&current_time));
+        printf("Updated Time: %s\n", updated_time_str);
+
         sleep(1); // 1초 대기
+        
     }
 
     close(fd);
