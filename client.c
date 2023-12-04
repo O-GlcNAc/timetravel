@@ -28,22 +28,29 @@ int main(int argc, char **argv) {
         strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", tm_current);
 
         // 각 센서 ID에 따라 데이터 생성
-        if (sensor_id == 1) {
-            reading = rand() % 61 - 20; // sensor_id 1의 reading은 -20에서 40 사이 값
-            humidity = 10;
-            temperature = 10;
-            luminance = 10;
-        } else if (sensor_id == 2) {
-            reading = rand() % 101; // sensor_id 2의 reading은 0에서 100 사이 값
-            humidity = 20;
-            temperature = 20;
-            luminance = 20;
-        } else {
-            reading = rand() % 21; // sensor_id 3의 reading은 0에서 20 사이 값
-            humidity = 30;
-            temperature = 30;
-            luminance = 30;
+        switch(sensor_id) {
+        case 1: // 당근
+            temperature = rand() % 5 + 16; // 16°C - 20°C
+            humidity = rand() % 11 + 60; // 60% - 70%
+            break;
+        case 2: // 상추
+            temperature = rand() % 4 + 15; // 15°C - 18°C
+            humidity = rand() % 11 + 70; // 70% - 80%
+            break;
+        case 3: // 가지
+            temperature = rand() % 5 + 20; // 20°C - 24°C
+            humidity = rand() % 11 + 60; // 60% - 70%
+            break;
         }
+        int hour = tm_current->tm_hour;
+        if (hour >= 6 && hour < 18) { // 낮 시간
+            // 선형 증가 광도 계산
+            int max_luminance = (sensor_id == 1) ? 50 : (sensor_id == 2) ? 70 : 100;
+            luminance = (hour - 6) * max_luminance / 12;
+        } else { // 밤 시간
+            luminance = 0;
+        }
+
 
         // FIFO로 sensor_id, reading, temperature, humidity, luminance, timestamp 데이터 전송
         dprintf(fd, "%d %d %d %d %d %s\n", sensor_id, reading, temperature, humidity, luminance, timestamp);
