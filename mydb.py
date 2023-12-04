@@ -7,7 +7,7 @@ connection = pymysql.connect(host='localhost',
                              database='exam',
                              cursorclass=pymysql.cursors.DictCursor)
 
-# 수정된 함수: timestamp도 파싱
+
 def parse_sensor_data(data):
     parts = data.strip().split()
     sensor_id = int(parts[0])
