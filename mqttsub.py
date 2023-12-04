@@ -47,6 +47,7 @@ def on_message(client, userdata, msg):
     print(f"Received: {msg.payload.decode()}")
     received_data.append(msg.payload.decode())
     if len(received_data) == 50:  # If 50 messages received
+        print("recievedata on message")
         process_data()
 
 def process_data():
@@ -58,6 +59,8 @@ def process_data():
         humidities.append(float(parts[2].split(': ')[1]))
         illuminances.append(float(parts[3].split(': ')[1]))
         timestamps.append(parts[4].split(': ')[1])
+
+    print("processdata")
 
     df = pd.DataFrame({
         'sensor_id': sensor_ids,
@@ -96,6 +99,8 @@ def generate_plot(df):
     img_data = base64.b64encode(img.getvalue()).decode()
     socketio.emit('update_plot', img_data)
 
+    print("generate_plot")
+
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
@@ -111,7 +116,9 @@ def handle_get_plot():
     # Define get_sensor_data() function or fetch data here
     sensor_data = get_sensor_data()
     if sensor_data is not None:
+        print("handle_get_plot")
         generate_plot(sensor_data)
+        
 
 if __name__ == '__main__':
     socketio.run(app, port=5001)
