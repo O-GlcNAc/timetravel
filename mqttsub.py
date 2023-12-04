@@ -73,6 +73,7 @@ def generate_plot(df):
     # 시간 데이터를 datetime 객체로 변환하고 정렬
     df['timestamp'] = pd.to_datetime(df['timestamp'])
     df = df.sort_values('timestamp')
+    print(df['timestamp'])
 
     # 센서 ID에 따라 데이터를 필터링하고 그래프 생성
     for sensor_id in df['sensor_id'].unique():
