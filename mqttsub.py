@@ -27,6 +27,9 @@ def get_sensor_data():
     illuminance = float(parts[3].split(': ')[1])
     timestamp = parts[4].split(': ')[1]
 
+    print("getsensordata" )
+    print(timestamp)
+
     return pd.DataFrame({
         'sensor_id': [sensor_id],
         'temperature': [temperature],
