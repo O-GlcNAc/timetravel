@@ -15,7 +15,7 @@ def parse_sensor_data(data):
     temperature = float(parts[2])
     humidity = float(parts[3])
     illuminance = float(parts[4])
-    timestamp = parts[5]  # timestamp 추가
+    timestamp = parts[5] + " " + parts[6]  # timestamp 추가
     return sensor_id, reading, temperature, humidity, illuminance, timestamp
 
 # Modify this part to read from FIFO and process the received data
