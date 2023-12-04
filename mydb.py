@@ -18,7 +18,6 @@ def parse_sensor_data(data):
     timestamp = parts[5] + " " + parts[6]  # timestamp 추가
     return sensor_id, reading, temperature, humidity, illuminance, timestamp
 
-# Modify this part to read from FIFO and process the received data
 with open('fifo', 'r') as fifo_file:
     while True:
         line = fifo_file.readline().strip()  # Read a line from FIFO
@@ -28,8 +27,6 @@ with open('fifo', 'r') as fifo_file:
         sensor_id, reading, temperature, humidity, illuminance, timestamp = parse_sensor_data(line)  # Parse the received data
 
         with connection.cursor() as cursor:
-            # Insert the parsed data into SensorData table
-            # CURRENT_TIMESTAMP 대신 클라이언트에서 보낸 timestamp 사용
             sql = "INSERT INTO SensorData (sensor_id, reading, temperature, humidity, illuminance, timestamp) VALUES (%s, %s, %s, %s, %s, %s)"
             cursor.execute(sql, (sensor_id, reading, temperature, humidity, illuminance, timestamp))
 
