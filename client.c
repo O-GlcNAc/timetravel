@@ -42,14 +42,15 @@ int main(int argc, char **argv) {
             humidity = rand() % 11 + 60; // 60% - 70%
             break;
         }
-        int hour = tm_current->tm_hour;
-        if (hour >= 6 && hour < 18) { // 낮 시간
-            // 선형 증가 광도 계산
-            int max_luminance = (sensor_id == 1) ? 50 : (sensor_id == 2) ? 70 : 100;
-            luminance = (hour - 6) * max_luminance / 12;
-        } else { // 밤 시간
-            luminance = 0;
-        }
+        // int hour = tm_current->tm_hour;
+        // if (hour >= 6 && hour < 18) { // 낮 시간
+        //     // 선형 증가 광도 계산
+        //     int max_luminance = (sensor_id == 1) ? 50 : (sensor_id == 2) ? 70 : 100;
+        //     luminance = (hour - 6) * max_luminance / 12;
+        // } else { // 밤 시간
+        //     luminance = 0;
+        // }
+        luminance = 70;
 
 
         // FIFO로 sensor_id, reading, temperature, humidity, luminance, timestamp 데이터 전송
