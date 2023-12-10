@@ -97,22 +97,20 @@ def generate_plot(df):
     plt.savefig(img, format='png', bbox_inches='tight')
     plt.close()  # 중요: 리소스 해제
     img.seek(0)
-    img_data = base64.b64encode(img.getvalue()).decode('ascii')
-
-    socketio.emit('update_plot', {
-        "img_data" : img_data
-    })
+    img_data = base64.b64encode(img.getvalue()).decode()
+    socketio.emit('update_plot', img_data)
 
     print("generate_plot")
 
-client = mqtt.Client()
-client.on_connect = on_connect
-client.on_message = on_message
-client.connect(broker_address, broker_port)
-client.loop_start()
-
 @app.route('/')
 def index():
+
+    client = mqtt.Client()
+    client.on_connect = on_connect
+    client.on_message = on_message
+    client.connect(broker_address, broker_port)
+    client.loop_start()
+
     return render_template("index_plot.html")
 
 @socketio.on('get_plot')
