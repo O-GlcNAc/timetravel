@@ -22,17 +22,24 @@
     </div>
 
     <script type="text/javascript">
-        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        
+        var socket = io.connect('http://' + document.domain + ':5001');
 
         socket.on('connect', function() {
+        
             console.log('Websocket connected!');
-            socket.emit('get_plot');
+
+            setInterval(() => { 
+                socket.emit('get_plot'); 
+            }, 3000);
+        
         });
 
         socket.on('update_plot', function(imgData) {
             var plotElement = document.getElementById('dataPlot');
             plotElement.src = 'data:image/png;base64,' + imgData;
         });
+
     </script>
 </body>
 </html>
