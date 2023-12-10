@@ -32,14 +32,17 @@ int main(int argc, char **argv) {
         case 1: // 당근
             temperature = rand() % 5 + 16; // 16°C - 20°C
             humidity = rand() % 11 + 60; // 60% - 70%
+            luminance = 50;
             break;
         case 2: // 상추
             temperature = rand() % 4 + 15; // 15°C - 18°C
             humidity = rand() % 11 + 70; // 70% - 80%
+            luminance = 80;
             break;
         case 3: // 가지
             temperature = rand() % 5 + 20; // 20°C - 24°C
             humidity = rand() % 11 + 60; // 60% - 70%
+            luminance = 60;
             break;
         }
         // int hour = tm_current->tm_hour;
