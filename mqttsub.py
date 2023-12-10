@@ -19,9 +19,9 @@ def get_sensor_data():
         return None
 
     # 가정: 가장 최근의 데이터를 그래프로 그리고 싶은 경우
-    latest_data = received_data[-1]  # 마지막으로 수신된 데이터 가져오기
+    latest_data = received_data[0]  # 마지막으로 수신된 데이터 가져오기
     parts = latest_data.split(', ')
-    sensor_id = parts[0].split(': ')[1]
+    sensor_id = parts[1].split(': ')[1]
     temperature = float(parts[1].split(': ')[1])
     humidity = float(parts[2].split(': ')[1])
     illuminance = float(parts[3].split(': ')[1])
@@ -102,15 +102,15 @@ def generate_plot(df):
 
     print("generate_plot")
 
+client = mqtt.Client()
+client.on_connect = on_connect
+client.on_message = on_message
+client.connect(broker_address, broker_port)
+client.loop_start()
+
+
 @app.route('/')
 def index():
-
-    client = mqtt.Client()
-    client.on_connect = on_connect
-    client.on_message = on_message
-    client.connect(broker_address, broker_port)
-    client.loop_start()
-
     return render_template("index_plot.html")
 
 @socketio.on('get_plot')
