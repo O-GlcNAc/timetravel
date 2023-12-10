@@ -113,7 +113,6 @@ def index():
 
 @socketio.on('get_plot')
 def handle_get_plot():
-    # Define get_sensor_data() function or fetch data here
     sensor_data = get_sensor_data()
     if sensor_data is not None:
         print("handle_get_plot")
