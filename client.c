@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
         // } else { // 밤 시간
         //     luminance = 0;
         // }
-        luminance = 70;
+        // luminance = 70;
 
 
         // FIFO로 sensor_id, reading, temperature, humidity, luminance, timestamp 데이터 전송
