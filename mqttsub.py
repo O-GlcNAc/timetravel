@@ -81,7 +81,6 @@ def generate_plot(df):
     # 센서 ID에 따라 데이터를 필터링하고 그래프 생성
     for sensor_id in df['sensor_id'].unique():
         sensor_df = df[df['sensor_id'] == sensor_id]
-
         plt.plot(sensor_df['timestamp'], sensor_df['temperature'], label=f'Temp Sensor {sensor_id}')
         plt.plot(sensor_df['timestamp'], sensor_df['humidity'], label=f'Humidity Sensor {sensor_id}')
         plt.plot(sensor_df['timestamp'], sensor_df['illuminance'], label=f'Illuminance Sensor {sensor_id}')
@@ -102,15 +101,14 @@ def generate_plot(df):
 
     print("generate_plot")
 
+client = mqtt.Client()
+client.on_connect = on_connect
+client.on_message = on_message
+client.connect(broker_address, broker_port)
+client.loop_start()
+
 @app.route('/')
 def index():
-
-    client = mqtt.Client()
-    client.on_connect = on_connect
-    client.on_message = on_message
-    client.connect(broker_address, broker_port)
-    client.loop_start()
-
     return render_template("index_plot.html")
 
 @socketio.on('get_plot')
